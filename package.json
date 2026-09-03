@@ -1,0 +1,18 @@
+{
+  "name": "xiangqi-openai-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic Xiangqi engine and MCP server for ChatGPT and Codex.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "start:stdio": "node stdio.js",
+    "test": "node --test",
+    "check": "node --check server.js && node --check stdio.js && node --check src/engine.js && node --check src/game-store.js && node --check src/mcp-server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.20.2",
+    "zod": "3.25.76"
+  }
+}

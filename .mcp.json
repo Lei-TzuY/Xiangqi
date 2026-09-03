@@ -1,0 +1,6 @@
+{
+  "xiangqi": {
+    "command": "node",
+    "args": ["./stdio.js"]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "xiangqi",
+  "version": "0.1.0",
+  "description": "Play server-validated Chinese chess with deterministic Xiangqi rules.",
+  "author": {
+    "name": "Lei-TzuY",
+    "url": "https://github.com/Lei-TzuY"
+  },
+  "homepage": "https://github.com/Lei-TzuY/Xiangqi",
+  "repository": "https://github.com/Lei-TzuY/Xiangqi",
+  "license": "MIT",
+  "keywords": ["xiangqi", "chinese-chess", "game", "mcp"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Xiangqi",
+    "shortDescription": "Play rule-valid Xiangqi",
+    "longDescription": "Start and play Chinese chess games backed by a deterministic rules engine. Xiangqi validates every move, enforces turn ownership, exposes legal moves, and reports check and game-ending states so ChatGPT and Codex do not have to guess board legality.",
+    "developerName": "Lei-TzuY",
+    "category": "Entertainment",
+    "capabilities": ["Play Xiangqi", "Validate moves", "Inspect legal moves"],
+    "websiteURL": "https://github.com/Lei-TzuY/Xiangqi",
+    "privacyPolicyURL": "https://github.com/Lei-TzuY/Xiangqi/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/Lei-TzuY/Xiangqi/blob/main/TERMS.md",
+    "supportURL": "https://github.com/Lei-TzuY/Xiangqi/issues",
+    "defaultPrompt": [
+      "Start a Xiangqi game. I want to play Red.",
+      "Start a Xiangqi game. I want to play Black.",
+      "Show me all legal moves in my current Xiangqi game."
+    ]
+  }
+}
