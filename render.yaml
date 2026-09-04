@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: xiangqi-mcp
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /ready
+    maxShutdownDelaySeconds: 15
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "120"
+      - key: REDIS_URL
+        fromService:
+          name: xiangqi-kv
+          type: keyvalue
+          property: connectionString
+
+  - type: keyvalue
+    name: xiangqi-kv
+    plan: free
+    region: singapore
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+    persistenceMode: off

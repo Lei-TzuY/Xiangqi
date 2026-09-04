@@ -2,10 +2,12 @@
 
 Last updated: 2026-09-04
 
-Xiangqi is currently an open-source prototype. The current game service does not require user accounts and does not intentionally request names, email addresses, phone numbers, payment information, precise location, contacts, or other personal profile data.
+Xiangqi does not require user accounts and does not intentionally request names, email addresses, phone numbers, payment information, precise location, contacts, or other personal profile data.
 
-Game state consists of a random game identifier, board position, move history, selected user/model colors, timestamps, and game status. In the current implementation this state is held in process memory and expires after 24 hours or when the process restarts.
+Game state consists of a random game identifier, board position, move history, selected user/model colors, timestamps, and game status. When a shared Redis/Valkey backend is configured, each game is stored under its random identifier with a 24-hour time-to-live and the expiry is refreshed when the game changes. Without a shared backend, state remains process-local memory.
 
-A future production deployment may generate ordinary infrastructure logs needed for reliability, security, abuse prevention, and debugging. This policy must be reviewed and updated before public deployment if hosting, analytics, authentication, persistent storage, or any additional data collection is introduced.
+The hosted service may generate ordinary infrastructure logs for reliability, security, abuse prevention, and debugging. Application logs include request identifiers, request method/path, status code, duration, service events, and error messages. The application does not intentionally log Xiangqi board state or move history in normal request logs.
+
+The public staging configuration uses Render. Render may process ordinary infrastructure metadata according to its own service terms and privacy practices. This policy must be reviewed again before public OpenAI submission if authentication, analytics, additional hosting providers, or new data collection is introduced.
 
 Questions or privacy requests can be filed at https://github.com/Lei-TzuY/Xiangqi/issues.
