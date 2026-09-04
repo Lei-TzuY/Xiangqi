@@ -1,8 +1,11 @@
+import { readFile } from "node:fs/promises";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerAppResource, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { GameStore } from "./game-store.js";
 
 export const gameStore = new GameStore();
+export const BOARD_RESOURCE_URI = "ui://xiangqi/board-v1.html";
 
 const colorSchema = z.enum(["red", "black"]);
 const statusSchema = z.enum(["active", "checkmate", "stalemate", "general_captured", "resigned"]);
@@ -56,6 +59,14 @@ const writeAnnotations = {
   openWorldHint: false,
 };
 
+const boardToolMeta = {
+  ui: { resourceUri: BOARD_RESOURCE_URI },
+  "openai/outputTemplate": BOARD_RESOURCE_URI,
+  "openai/widgetAccessible": true,
+  "openai/toolInvocation/invoking": "Updating Xiangqi board…",
+  "openai/toolInvocation/invoked": "Xiangqi board ready",
+};
+
 function textResult(structuredContent, text) {
   return {
     structuredContent,
@@ -71,32 +82,62 @@ function errorResult(error) {
   };
 }
 
+export async function loadBoardHtml() {
+  return readFile(new URL("../dist/index.html", import.meta.url), "utf8");
+}
+
+function registerBoardResource(server) {
+  registerAppResource(
+    server,
+    BOARD_RESOURCE_URI,
+    BOARD_RESOURCE_URI,
+    { mimeType: RESOURCE_MIME_TYPE },
+    async () => ({
+      contents: [
+        {
+          uri: BOARD_RESOURCE_URI,
+          mimeType: RESOURCE_MIME_TYPE,
+          text: await loadBoardHtml(),
+          _meta: {
+            ui: { prefersBorder: true },
+            "openai/widgetDescription": "Interactive Xiangqi board with legal-target highlighting and click-to-move controls.",
+            "openai/widgetPrefersBorder": true,
+          },
+        },
+      ],
+    }),
+  );
+}
+
 export function createXiangqiServer(store = gameStore) {
   const server = new McpServer(
-    { name: "xiangqi", version: "0.1.0" },
+    { name: "xiangqi", version: "0.2.0" },
     {
       instructions:
-        "Use start_game before game actions. Treat server legality as authoritative. For a user-supplied move, call make_move with actor=user only after mapping it to UCCI a0-i9 coordinates. On the model's turn, call list_legal_moves, choose one returned move, then call make_move with actor=model. Never invent or silently alter a rejected move. Red starts at ranks 0-4 and moves toward rank 9.",
+        "Use start_game before game actions. Treat server legality as authoritative. The interactive board may submit user moves directly through make_move. For a user-supplied text move, call make_move with actor=user only after mapping it to UCCI a0-i9 coordinates. On the model's turn, call list_legal_moves, choose one returned move, then call make_move with actor=model. Never invent or silently alter a rejected move. Red starts at ranks 0-4 and moves toward rank 9.",
     },
   );
+
+  registerBoardResource(server);
 
   server.registerTool(
     "start_game",
     {
       title: "Start Xiangqi game",
       description:
-        "Start a new Xiangqi game. Use when the user asks to play Chinese chess or wants a fresh game. Red always moves first.",
+        "Start a new Xiangqi game and render the interactive board. Use when the user asks to play Chinese chess or wants a fresh game. Red always moves first.",
       inputSchema: {
         userColor: colorSchema.optional().default("red").describe("The side controlled by the user."),
       },
       outputSchema: gameOutputSchema,
       securitySchemes: [{ type: "noauth" }],
       annotations: writeAnnotations,
+      _meta: boardToolMeta,
     },
     async ({ userColor }) => {
       try {
         const game = store.start(userColor);
-        const view = store.view(game, false);
+        const view = store.view(game, true);
         const firstActor = game.userColor === "red" ? "user" : "model";
         return textResult(
           view,
@@ -112,16 +153,17 @@ export function createXiangqiServer(store = gameStore) {
     "get_game",
     {
       title: "Get Xiangqi game",
-      description: "Read the current board, turn, check state, and result for an existing Xiangqi game.",
+      description: "Read and render the current board, turn, check state, legal moves, and result for an existing Xiangqi game.",
       inputSchema: { gameId: z.string().uuid() },
       outputSchema: gameOutputSchema,
       securitySchemes: [{ type: "noauth" }],
       annotations: readAnnotations,
+      _meta: boardToolMeta,
     },
     async ({ gameId }) => {
       try {
         const game = store.get(gameId);
-        return textResult(store.view(game, false), `Game ${gameId}: ${game.status}; ${game.sideToMove} to move.`);
+        return textResult(store.view(game, true), `Game ${gameId}: ${game.status}; ${game.sideToMove} to move.`);
       } catch (error) {
         return errorResult(error);
       }
@@ -160,7 +202,7 @@ export function createXiangqiServer(store = gameStore) {
     {
       title: "Make Xiangqi move",
       description:
-        "Apply exactly one Xiangqi move after the user or model has chosen it. The server rejects illegal moves, wrong-turn actors, self-check, and flying-general violations.",
+        "Apply exactly one Xiangqi move and refresh the interactive board. The server rejects illegal moves, wrong-turn actors, self-check, and flying-general violations.",
       inputSchema: {
         gameId: z.string().uuid(),
         actor: actorSchema.describe("Use user only for a move chosen by the user; use model for the assistant's own move."),
@@ -170,11 +212,12 @@ export function createXiangqiServer(store = gameStore) {
       outputSchema: gameOutputSchema,
       securitySchemes: [{ type: "noauth" }],
       annotations: writeAnnotations,
+      _meta: boardToolMeta,
     },
     async ({ gameId, actor, from, to }) => {
       try {
         const { game, move } = store.move(gameId, actor, from, to);
-        const view = store.view(game, false);
+        const view = store.view(game, true);
         const suffix = game.status === "active"
           ? `${game.sideToMove} to move${game.inCheck ? " in check" : ""}.`
           : `Game ended: ${game.status}; winner ${game.winner}.`;
@@ -189,7 +232,7 @@ export function createXiangqiServer(store = gameStore) {
     "resign_game",
     {
       title: "Resign Xiangqi game",
-      description: "End an active Xiangqi game because the user or model explicitly resigns.",
+      description: "End an active Xiangqi game because the user or model explicitly resigns, then render the final board.",
       inputSchema: {
         gameId: z.string().uuid(),
         actor: actorSchema.describe("The side that explicitly chose to resign."),
@@ -201,6 +244,7 @@ export function createXiangqiServer(store = gameStore) {
         destructiveHint: true,
         openWorldHint: false,
       },
+      _meta: boardToolMeta,
     },
     async ({ gameId, actor }) => {
       try {

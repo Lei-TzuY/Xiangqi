@@ -22,11 +22,13 @@
 
 ## M3 — Interactive board UI
 
-- [ ] MCP Apps board component
-- [ ] Click/tap move input and legal-target highlighting
-- [ ] Responsive mobile/desktop layout and accessibility
-- [ ] Picture-in-picture/fullscreen behavior where supported
-- [ ] UI remains optional; all tools continue to work headlessly
+- [x] MCP Apps board component using the stable `text/html;profile=mcp-app` resource contract
+- [x] Click/tap move input and server-provided legal-target highlighting
+- [x] Responsive mobile/desktop layout, keyboard focus, board orientation, and manual flip
+- [x] Host-negotiated fullscreen/PiP controls where supported
+- [x] UI remains optional; all tools continue to work headlessly
+- [ ] Validate the widget inside ChatGPT developer mode against a hosted HTTPS MCP endpoint
+- [ ] Add visual regression/browser tests once a repeatable MCP Apps host harness is pinned
 
 ## M4 — Production service
 

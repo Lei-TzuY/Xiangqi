@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Xiangqi</title>
+  </head>
+  <body>
+    <main class="app-shell" aria-live="polite">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">中國象棋 · XIANGQI</div>
+          <h1>Play Xiangqi</h1>
+        </div>
+        <div class="display-actions" aria-label="Display controls">
+          <button class="secondary" id="pip-button" type="button" hidden>PiP</button>
+          <button class="secondary" id="fullscreen-button" type="button" hidden>Fullscreen</button>
+        </div>
+      </header>
+
+      <section class="status-strip">
+        <div>
+          <span class="status-label">Status</span>
+          <strong id="status-text">Waiting for a game…</strong>
+        </div>
+        <div class="turn-chip" id="turn-chip">—</div>
+      </section>
+
+      <section class="board-wrap">
+        <div class="board" id="board" role="grid" aria-label="Xiangqi board"></div>
+        <div class="river" aria-hidden="true"><span>楚 河</span><span>漢 界</span></div>
+      </section>
+
+      <footer class="footer-bar">
+        <div id="hint-text">Start a game to begin.</div>
+        <button class="secondary" id="flip-button" type="button">Flip board</button>
+      </footer>
+    </main>
+    <script type="module" src="/src/mcp-app.js"></script>
+  </body>
+</html>
