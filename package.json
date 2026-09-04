@@ -1,18 +1,26 @@
 {
   "name": "xiangqi-openai-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Deterministic Xiangqi engine and MCP server for ChatGPT and Codex.",
-  "engines": { "node": ">=20" },
+  "description": "Deterministic Xiangqi engine, MCP server, and interactive MCP Apps board for ChatGPT and Codex.",
+  "engines": { "node": ">=20.19.0" },
   "scripts": {
+    "build:ui": "vite build",
+    "prestart": "npm run build:ui",
     "start": "node server.js",
+    "prestart:stdio": "npm run build:ui",
     "start:stdio": "node stdio.js",
-    "test": "node --test",
-    "check": "node --check server.js && node --check stdio.js && node --check src/engine.js && node --check src/game-store.js && node --check src/mcp-server.js"
+    "test": "npm run build:ui && node --test",
+    "check": "node --check server.js && node --check stdio.js && node --check vite.config.js && node --check src/engine.js && node --check src/game-store.js && node --check src/mcp-server.js && node --check ui/src/mcp-app.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.20.2",
+    "@modelcontextprotocol/ext-apps": "1.7.5",
+    "@modelcontextprotocol/sdk": "1.30.0",
     "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "vite": "7.3.6",
+    "vite-plugin-singlefile": "2.3.3"
   }
 }
