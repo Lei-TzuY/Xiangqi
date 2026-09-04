@@ -19,3 +19,19 @@ test("rate limiter resets on a new window and isolates clients", () => {
   assert.equal(allow("b", 500).allowed, true);
   assert.equal(allow("a", 1_001).allowed, true);
 });
+
+test("rate limiter evicts the oldest bucket instead of growing past maxEntries", () => {
+  const allow = createFixedWindowRateLimiter({ limit: 1, windowMs: 10_000, maxEntries: 2 });
+  assert.equal(allow("a", 0).allowed, true);
+  assert.equal(allow("b", 0).allowed, true);
+  assert.equal(allow("c", 0).allowed, true);
+
+  // `a` was the oldest bucket and must have been evicted to make room for `c`.
+  assert.equal(allow("a", 100).allowed, true);
+});
+
+test("rate limiter rejects invalid capacity settings", () => {
+  assert.throws(() => createFixedWindowRateLimiter({ limit: 0 }), /limit/);
+  assert.throws(() => createFixedWindowRateLimiter({ windowMs: 0 }), /windowMs/);
+  assert.throws(() => createFixedWindowRateLimiter({ maxEntries: 0 }), /maxEntries/);
+});
