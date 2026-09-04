@@ -2,9 +2,9 @@ import { readFile } from "node:fs/promises";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerAppResource, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
-import { GameStore } from "./game-store.js";
+import { createGameStore } from "./game-store.js";
 
-export const gameStore = new GameStore();
+export const gameStore = createGameStore();
 export const BOARD_RESOURCE_URI = "ui://xiangqi/board-v1.html";
 
 const colorSchema = z.enum(["red", "black"]);
@@ -111,7 +111,7 @@ function registerBoardResource(server) {
 
 export function createXiangqiServer(store = gameStore) {
   const server = new McpServer(
-    { name: "xiangqi", version: "0.2.0" },
+    { name: "xiangqi", version: "0.3.0" },
     {
       instructions:
         "Use start_game before game actions. Treat server legality as authoritative. The interactive board may submit user moves directly through make_move. For a user-supplied text move, call make_move with actor=user only after mapping it to UCCI a0-i9 coordinates. On the model's turn, call list_legal_moves, choose one returned move, then call make_move with actor=model. Never invent or silently alter a rejected move. Red starts at ranks 0-4 and moves toward rank 9.",
@@ -136,7 +136,7 @@ export function createXiangqiServer(store = gameStore) {
     },
     async ({ userColor }) => {
       try {
-        const game = store.start(userColor);
+        const game = await store.start(userColor);
         const view = store.view(game, true);
         const firstActor = game.userColor === "red" ? "user" : "model";
         return textResult(
@@ -162,7 +162,7 @@ export function createXiangqiServer(store = gameStore) {
     },
     async ({ gameId }) => {
       try {
-        const game = store.get(gameId);
+        const game = await store.get(gameId);
         return textResult(store.view(game, true), `Game ${gameId}: ${game.status}; ${game.sideToMove} to move.`);
       } catch (error) {
         return errorResult(error);
@@ -187,8 +187,8 @@ export function createXiangqiServer(store = gameStore) {
     },
     async ({ gameId }) => {
       try {
-        const game = store.get(gameId);
-        const moves = store.legal(gameId);
+        const game = await store.get(gameId);
+        const moves = await store.legal(gameId);
         const result = { gameId, sideToMove: game.sideToMove, legalMoves: moves };
         return textResult(result, `${moves.length} legal moves for ${game.sideToMove}.`);
       } catch (error) {
@@ -216,7 +216,7 @@ export function createXiangqiServer(store = gameStore) {
     },
     async ({ gameId, actor, from, to }) => {
       try {
-        const { game, move } = store.move(gameId, actor, from, to);
+        const { game, move } = await store.move(gameId, actor, from, to);
         const view = store.view(game, true);
         const suffix = game.status === "active"
           ? `${game.sideToMove} to move${game.inCheck ? " in check" : ""}.`
@@ -248,7 +248,7 @@ export function createXiangqiServer(store = gameStore) {
     },
     async ({ gameId, actor }) => {
       try {
-        const game = store.resign(gameId, actor);
+        const game = await store.resign(gameId, actor);
         return textResult(store.view(game, false), `${actor} resigned. ${game.winner} wins game ${gameId}.`);
       } catch (error) {
         return errorResult(error);

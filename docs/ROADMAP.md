@@ -32,11 +32,15 @@
 
 ## M4 — Production service
 
-- [ ] Durable shared game store (not process-local memory)
-- [ ] Rate limiting, observability, structured logs, abuse controls
-- [ ] Public HTTPS deployment with stable `/mcp` endpoint
-- [ ] Production health checks and deployment rollback path
-- [ ] Load/concurrency testing
+- [x] Shared Redis/Valkey game store selected automatically through `REDIS_URL`
+- [x] Optimistic concurrency for multi-instance move/resign mutations
+- [x] Per-instance request rate limiting and structured JSON request/error logs
+- [x] Liveness/readiness endpoints and graceful shutdown
+- [x] Docker image and Render Blueprint with Singapore staging topology
+- [x] CI builds the production container
+- [ ] Deploy public HTTPS staging and smoke-test `/ready` + `/mcp`
+- [ ] Upgrade Key Value to a persistent paid plan before claiming production durability
+- [ ] Load/concurrency testing against the hosted service
 
 ## M5 — OpenAI public submission
 

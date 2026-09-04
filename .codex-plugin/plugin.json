@@ -1,6 +1,6 @@
 {
   "name": "xiangqi",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Play server-validated Chinese chess with an interactive Xiangqi board.",
   "author": {
     "name": "Lei-TzuY",
@@ -15,7 +15,7 @@
   "interface": {
     "displayName": "Xiangqi",
     "shortDescription": "Play Xiangqi on an interactive board",
-    "longDescription": "Start and play Chinese chess games backed by a deterministic rules engine and an interactive MCP Apps board. Xiangqi validates every move on the server, highlights legal targets, enforces turn ownership, and reports check and game-ending states so ChatGPT and Codex never have to guess board legality.",
+    "longDescription": "Start and play Chinese chess games backed by a deterministic rules engine, shared game state, and an interactive MCP Apps board. Xiangqi validates every move on the server, highlights legal targets, enforces turn ownership, and reports check and game-ending states so ChatGPT and Codex never have to guess board legality.",
     "developerName": "Lei-TzuY",
     "category": "Entertainment",
     "capabilities": ["Play Xiangqi", "Interactive board", "Validate moves", "Inspect legal moves"],

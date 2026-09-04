@@ -7,7 +7,10 @@ This is a working checklist, not a claim that the plugin is submission-ready tod
 - [ ] Public production HTTPS domain
 - [ ] Stable `/mcp` endpoint reachable by OpenAI reviewers
 - [ ] No localhost, temporary tunnel, or test-only endpoint in the final submission
-- [ ] Durable game state across process restarts and multiple instances
+- [x] Shared game state supported across process instances through Redis/Valkey
+- [x] Liveness/readiness checks and graceful shutdown
+- [x] Production container build covered by CI
+- [ ] Persistent paid datastore enabled for the public production service
 - [ ] Tool metadata scanned and manually verified after deployment
 
 ## Tool contract
@@ -22,16 +25,17 @@ This is a working checklist, not a claim that the plugin is submission-ready tod
 ## Product quality
 
 - [x] Core move legality covered by regression tests
+- [x] Interactive board UI implemented and keyboard-focusable
+- [x] Server-authoritative legal-target highlighting
 - [ ] Competition-specific repetition/long-check rules implemented and tested
 - [ ] Chinese move notation implemented and tested
-- [ ] Interactive board UI implemented and accessible
 - [ ] Representative evaluation set covers positive, boundary, and negative prompts
 
 ## Publication
 
 - [ ] Developer identity verified in OpenAI Platform
 - [ ] Publication name matches verified identity/business
-- [ ] Privacy policy and terms reviewed for the production data flow
+- [ ] Privacy policy and terms reviewed for the final production data flow
 - [ ] Support URL monitored
-- [ ] Logo and screenshots prepared once UI exists
+- [ ] Logo and screenshots prepared
 - [ ] Submission localization reviewed

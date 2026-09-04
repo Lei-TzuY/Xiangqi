@@ -1,9 +1,9 @@
 {
   "name": "xiangqi-openai-plugin",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Deterministic Xiangqi engine, MCP server, and interactive MCP Apps board for ChatGPT and Codex.",
+  "description": "Deterministic Xiangqi engine, MCP server, interactive MCP Apps board, and production-ready shared state for ChatGPT and Codex.",
   "engines": { "node": ">=20.19.0" },
   "scripts": {
     "build:ui": "vite build",
@@ -12,11 +12,12 @@
     "prestart:stdio": "npm run build:ui",
     "start:stdio": "node stdio.js",
     "test": "npm run build:ui && node --test",
-    "check": "node --check server.js && node --check stdio.js && node --check vite.config.js && node --check src/engine.js && node --check src/game-store.js && node --check src/mcp-server.js && node --check ui/src/mcp-app.js"
+    "check": "node --check server.js && node --check stdio.js && node --check vite.config.js && node --check src/engine.js && node --check src/game-store.js && node --check src/mcp-server.js && node --check src/rate-limit.js && node --check ui/src/mcp-app.js"
   },
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "1.7.5",
     "@modelcontextprotocol/sdk": "1.30.0",
+    "ioredis": "6.0.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
